@@ -1,7 +1,10 @@
+import { getElementLeft, getElementTop } from './util';
+
 const imgLinks = document.querySelectorAll('.imgList li a');
 const zoomWrapper = document.querySelector('.zoomWrapper')
 const img = zoomWrapper.querySelector('img');
 const zoomWindow = document.querySelector('.zoomWindow');
+const zWindowImg = zoomWindow.querySelector('img');
 
 imgLinks.forEach((imgLink) => {
     imgLink.addEventListener('click', () => {
@@ -10,38 +13,13 @@ imgLinks.forEach((imgLink) => {
 
         let bigSrc = imgLink.dataset.bigsrc;
 
-        zoomWindow.style.backgroundImage = 'url(' + bigSrc +')';
+        zWindowImg.setAttribute('src', bigSrc);
     })
 })
 
 //移动
 const zoomMask = document.querySelector('.zoomMask');
 
-//获取元素的绝对横坐标
-function getElementLeft(element){
-　　var actualLeft = element.offsetLeft;
-　　var current = element.offsetParent;
-
-    while (current !== null){
-　　　　actualLeft += current.offsetLeft;
-　　　　current = current.offsetParent;
-　　}
-
-　　return actualLeft;
-}
-
-//获取元素的绝对纵坐标
-　function getElementTop(element){
-　　　　var actualTop = element.offsetTop;
-　　　　var current = element.offsetParent;
-
-　　　　while (current !== null){
-　　　　　　actualTop += current.offsetTop;
-　　　　　　current = current.offsetParent;
-　　　　}
-
-　　　　return actualTop;
-　　}
 
 zoomWrapper.addEventListener('mouseover', () => {
     zoomMask.classList.add('show');
@@ -79,17 +57,37 @@ document.addEventListener('mousemove', (e) => {
     // let bigImgPosLeft = parseInt(zoomMask.style.left) * 2;
     // let bigImgPosTop = parseInt(zoomMask.style.top) * 2; 
 
-    let x = getElementLeft(zoomMask) - getElementLeft(zoomWrapper)
-    let y = getElementTop(zoomMask) - getElementTop(zoomWrapper)
+    let x = getElementLeft(zoomMask) - getElementLeft(zoomWrapper) - 7;
+    let y = getElementTop(zoomMask) - getElementTop(zoomWrapper) - 7;
     console.log(x, y);
 
-    if(x === 0 && y === 0) {
-        zoomWindow.style.backgroundPosition = '0px 0px';
-    } else if(x > 0 && y > 0) {
-        zoomWindow.style.backgroundPosition = -x *3 + 'px, ' + -y * 3 + 'px'
-    }
-
-    
-
+    zWindowImg.style.top = `-${y * 2.9}px`;
+    zWindowImg.style.left = `-${x * 2.9}px`;
 
 })
+
+
+class ImgZoom {
+    constructor (el, options) {
+        this.el = document.querySelector(el);
+        this.opts = options;
+    }
+
+    init () {
+        this.iZoomInfo = {
+            offsetLeft: getElementLeft(this.el),
+            offsetTop: getElementTop(this.el)
+        }
+    }
+
+    addEvent () {
+        // this.el.addEventListener('mousemove', this.addClass)
+    }
+
+    // createMask () {
+    //     let 
+    // }
+
+}
+
+

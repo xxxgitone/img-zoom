@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="./img-zoom.css">
+    <title>image zoom</title>
+</head>
+<body>
+    <div class="box">
+        <div class="zoomWrapper">
+            <img src="./img/item_mid_1.jpg" width="420px">
+            <span class="zoomMask"></span>
+            <div class="zoomWindow">
+                <img src="./img/item_big_1.jpg">
+            </div>
+        </div>
+        <ul class="imgList">
+            <li>
+                <a href="javascript:;" data-midsrc="./img/item_mid_1.jpg" data-bigsrc="./img/item_big_1.jpg">
+                    <img src="./img/item_small_1.jpg">
+                </a>
+            </li>
+            <li>
+                <a href="javascript:;" data-midsrc="./img/item_mid_2.jpg" data-bigsrc="./img/item_big_2.jpg">
+                    <img src="./img/item_small_2.jpg">
+                </a>
+            </li>
+            <li>
+                <a href="javascript:;" data-midsrc="./img/item_mid_3.jpg" data-bigsrc="./img/item_big_3.jpg">
+                    <img src="./img/item_small_3.jpg">
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <script src="./dist/imgzoom.min.js"></script>
+</body>
+</html>
