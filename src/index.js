@@ -17,77 +17,129 @@ imgLinks.forEach((imgLink) => {
     })
 })
 
-//移动
-const zoomMask = document.querySelector('.zoomMask');
+// //移动
+// const zoomMask = document.querySelector('.zoomMask');
 
 
-zoomWrapper.addEventListener('mouseover', () => {
-    zoomMask.classList.add('show');
-    zoomWindow.classList.add('windowShow');
-})
+// zoomWrapper.addEventListener('mouseover', () => {
+//     zoomMask.classList.add('show');
+//     zoomWindow.classList.add('windowShow');
+// })
 
-zoomWrapper.addEventListener('mouseout', () => {
-    zoomMask.classList.remove('show');
-    zoomWindow.classList.remove('windowShow');
-})
+// zoomWrapper.addEventListener('mouseout', () => {
+//     zoomMask.classList.remove('show');
+//     zoomWindow.classList.remove('windowShow');
+// })
 
-document.addEventListener('mousemove', (e) => {
+// document.addEventListener('mousemove', (e) => {
 
     
 
-    zoomMask.style.top = (e.clientY - zoomMask.offsetHeight / 2) + 'px';
-    zoomMask.style.left = (e.clientX - zoomMask.offsetWidth / 2)  + 'px';
+//     zoomMask.style.top = (e.clientY - zoomMask.offsetHeight / 2) + 'px';
+//     zoomMask.style.left = (e.clientX - zoomMask.offsetWidth / 2)  + 'px';
 
 
 
-    if (parseInt(zoomMask.style.left) <= getElementLeft(zoomWrapper)) {
-        zoomMask.style.left = getElementLeft(zoomWrapper) + 'px';
-    }
-    if (parseInt(zoomMask.style.top) <= getElementTop(zoomWrapper)) {
-        zoomMask.style.top = getElementTop(zoomWrapper) + 'px';
-    }
-    if (parseInt(zoomMask.style.top) >= (getElementTop(zoomWrapper) + zoomWrapper.offsetHeight - zoomMask.offsetHeight)) {
-        zoomMask.style.top = (getElementTop(zoomWrapper) + zoomWrapper.offsetHeight - zoomMask.offsetHeight) + 'px';
-    }
+//     if (parseInt(zoomMask.style.left) <= getElementLeft(zoomWrapper)) {
+//         zoomMask.style.left = getElementLeft(zoomWrapper) + 'px';
+//     }
+//     if (parseInt(zoomMask.style.top) <= getElementTop(zoomWrapper)) {
+//         zoomMask.style.top = getElementTop(zoomWrapper) + 'px';
+//     }
+//     if (parseInt(zoomMask.style.top) >= (getElementTop(zoomWrapper) + zoomWrapper.offsetHeight - zoomMask.offsetHeight)) {
+//         zoomMask.style.top = (getElementTop(zoomWrapper) + zoomWrapper.offsetHeight - zoomMask.offsetHeight) + 'px';
+//     }
 
-    if (parseInt(zoomMask.style.left) >= (getElementLeft(zoomWrapper) + zoomWrapper.offsetWidth - zoomMask.offsetWidth)) {
-        zoomMask.style.left = (getElementLeft(zoomWrapper) + zoomWrapper.offsetWidth - zoomMask.offsetWidth) + 'px';
-    }
+//     if (parseInt(zoomMask.style.left) >= (getElementLeft(zoomWrapper) + zoomWrapper.offsetWidth - zoomMask.offsetWidth)) {
+//         zoomMask.style.left = (getElementLeft(zoomWrapper) + zoomWrapper.offsetWidth - zoomMask.offsetWidth) + 'px';
+//     }
 
-    // let bigImgPosLeft = parseInt(zoomMask.style.left) * 2;
-    // let bigImgPosTop = parseInt(zoomMask.style.top) * 2; 
+//     let bigImgPosLeft = parseInt(zoomMask.style.left) * 2;
+//     let bigImgPosTop = parseInt(zoomMask.style.top) * 2; 
 
-    let x = getElementLeft(zoomMask) - getElementLeft(zoomWrapper) - 7;
-    let y = getElementTop(zoomMask) - getElementTop(zoomWrapper) - 7;
-    console.log(x, y);
+//     let x = getElementLeft(zoomMask) - getElementLeft(zoomWrapper) - 7;
+//     let y = getElementTop(zoomMask) - getElementTop(zoomWrapper) - 7;
+//     console.log(x, y);
 
-    zWindowImg.style.top = `-${y * 2.9}px`;
-    zWindowImg.style.left = `-${x * 2.9}px`;
+//     zWindowImg.style.top = `-${y * 2.9}px`;
+//     zWindowImg.style.left = `-${x * 2.9}px`;
 
-})
+// })
 
 
 class ImgZoom {
-    constructor (el, options) {
+    constructor (el, options ) {
+        
+        let DEFAULT = {
+            created: false,
+            zoomMask: null
+        }
+
         this.el = document.querySelector(el);
-        this.opts = options;
+        this.opts = Object.assign({}, DEFAULT, options);
+        this.offset = {
+            left: getElementLeft(this.el),
+            top: getElementTop(this.el)
+        }
+
+        this.addEvent();
     }
 
-    init () {
-        this.iZoomInfo = {
-            offsetLeft: getElementLeft(this.el),
-            offsetTop: getElementTop(this.el)
-        }
-    }
 
     addEvent () {
-        // this.el.addEventListener('mousemove', this.addClass)
+        this.el.addEventListener('mousemove', this.createMask.bind(this));
+        this.el.addEventListener('mouseleave', this.leaveHandler.bind(this));
+    }
+    
+
+    createMask () {
+
+        if (!this.opts.created) {
+            let span = document.createElement('span');
+            span.className = 'zoomMask';
+            this.el.appendChild(span);
+
+
+            this.opts.created = true;
+            this.opts.zoomMask = span;
+            
+        }
+
+        this.opts.zoomMask.classList.add('show');
+        
+        document.addEventListener('mousemove', this.moveHandler.bind(this))
     }
 
-    // createMask () {
-    //     let 
-    // }
 
+
+    leaveHandler () {
+        this.opts.zoomMask.classList.remove('show');
+    }
+
+    moveHandler (e) {
+        let zoomMask = document.querySelector('.zoomMask');
+        zoomMask.style.top = (e.clientY - zoomMask.offsetHeight / 2) + 'px';
+        zoomMask.style.left = (e.clientX - zoomMask.offsetWidth / 2)  + 'px';
+        let boundY = this.offset.top + this.el.offsetHeight - zoomMask.offsetHeight;
+        let boundX = this.offset.left + this.el.offsetWidth - zoomMask.offsetWidth;
+
+        if (parseInt(zoomMask.style.left) <= this.offset.left) {
+            zoomMask.style.left = this.offset.left + 'px';
+        }
+        if (parseInt(zoomMask.style.top) <= this.offset.top) {
+            zoomMask.style.top = this.offset.top + 'px';
+        }
+        if (parseInt(zoomMask.style.top) >= boundY) {
+            zoomMask.style.top = boundY + 'px';
+        }
+
+        if (parseInt(zoomMask.style.left) >= boundX) {
+            zoomMask.style.left = boundX + 'px';
+        }
+    }
+    
 }
+
+new ImgZoom('.zoomWrapper');
 
 
