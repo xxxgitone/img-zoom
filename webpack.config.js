@@ -1,7 +1,8 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/index.js',
+    // entry: './src/index.js',
+    entry: './example/main.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'imgzoom.min.js'

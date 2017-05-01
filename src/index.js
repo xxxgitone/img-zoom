@@ -1,78 +1,13 @@
 import { getElementLeft, getElementTop } from './util';
 
-const imgLinks = document.querySelectorAll('.imgList li a');
-const zoomWrapper = document.querySelector('.zoomWrapper')
-const img = zoomWrapper.querySelector('img');
-const zoomWindow = document.querySelector('.zoomWindow');
-const zWindowImg = zoomWindow.querySelector('img');
-
-imgLinks.forEach((imgLink) => {
-    imgLink.addEventListener('click', () => {
-        let midSrc = imgLink.dataset.midsrc;
-        img.setAttribute('src', midSrc);
-
-        let bigSrc = imgLink.dataset.bigsrc;
-
-        zWindowImg.setAttribute('src', bigSrc);
-    })
-})
-
-// //移动
-// const zoomMask = document.querySelector('.zoomMask');
-
-
-// zoomWrapper.addEventListener('mouseover', () => {
-//     zoomMask.classList.add('show');
-//     zoomWindow.classList.add('windowShow');
-// })
-
-// zoomWrapper.addEventListener('mouseout', () => {
-//     zoomMask.classList.remove('show');
-//     zoomWindow.classList.remove('windowShow');
-// })
-
-// document.addEventListener('mousemove', (e) => {
-
-    
-
-//     zoomMask.style.top = (e.clientY - zoomMask.offsetHeight / 2) + 'px';
-//     zoomMask.style.left = (e.clientX - zoomMask.offsetWidth / 2)  + 'px';
-
-
-
-//     if (parseInt(zoomMask.style.left) <= getElementLeft(zoomWrapper)) {
-//         zoomMask.style.left = getElementLeft(zoomWrapper) + 'px';
-//     }
-//     if (parseInt(zoomMask.style.top) <= getElementTop(zoomWrapper)) {
-//         zoomMask.style.top = getElementTop(zoomWrapper) + 'px';
-//     }
-//     if (parseInt(zoomMask.style.top) >= (getElementTop(zoomWrapper) + zoomWrapper.offsetHeight - zoomMask.offsetHeight)) {
-//         zoomMask.style.top = (getElementTop(zoomWrapper) + zoomWrapper.offsetHeight - zoomMask.offsetHeight) + 'px';
-//     }
-
-//     if (parseInt(zoomMask.style.left) >= (getElementLeft(zoomWrapper) + zoomWrapper.offsetWidth - zoomMask.offsetWidth)) {
-//         zoomMask.style.left = (getElementLeft(zoomWrapper) + zoomWrapper.offsetWidth - zoomMask.offsetWidth) + 'px';
-//     }
-
-//     let bigImgPosLeft = parseInt(zoomMask.style.left) * 2;
-//     let bigImgPosTop = parseInt(zoomMask.style.top) * 2; 
-
-//     let x = getElementLeft(zoomMask) - getElementLeft(zoomWrapper) - 7;
-//     let y = getElementTop(zoomMask) - getElementTop(zoomWrapper) - 7;
-//     console.log(x, y);
-
-//     zWindowImg.style.top = `-${y * 2.9}px`;
-//     zWindowImg.style.left = `-${x * 2.9}px`;
-
-// })
-
-
 class ImgZoom {
-    constructor (el, options ) {
+    constructor (el, options = { zoomW: 420, zoomH: 420}) {
         
         let DEFAULT = {
             created: false,
-            zoomMask: null
+            mouseleaved: true,
+            zoomMask: null,
+            zoomWindow: null
         }
 
         this.el = document.querySelector(el);
@@ -81,39 +16,89 @@ class ImgZoom {
             left: getElementLeft(this.el),
             top: getElementTop(this.el)
         }
+        this.img = this.el.querySelector('img');
 
+        this.init();
+    }
+
+    init () {
+        this.img.setAttribute('width', this.el.offsetWidth + 'px');
         this.addEvent();
     }
 
 
     addEvent () {
-        this.el.addEventListener('mousemove', this.createMask.bind(this));
+        this.el.addEventListener('mousemove', this.create.bind(this));
         this.el.addEventListener('mouseleave', this.leaveHandler.bind(this));
+    }
+
+    create () {
+        if (!this.opts.created) {
+            this.createMask();
+            this.createZoomWindow();
+        }
+
+        let { img } = this.opts.zoomWindow;
+        let src = img.getAttribute('src');
+        
+
+        if (this.getImgSrc() !== src) {
+            this.createZoomWindow();
+        }
+
+        this.opts.created = true;
+
+        if(this.opts.mouseleaved) {
+            this.opts.zoomMask.classList.add('show');
+            this.opts.zoomWindow.classList.add('windowShow');
+            document.addEventListener('mousemove', this.moveHandler.bind(this));
+            this.opts.mouseleaved = false;
+        }
+        
     }
     
 
     createMask () {
+        let span = document.createElement('span');
+        span.className = 'zoomMask';
+        this.el.appendChild(span);
 
-        if (!this.opts.created) {
-            let span = document.createElement('span');
-            span.className = 'zoomMask';
-            this.el.appendChild(span);
-
-
-            this.opts.created = true;
-            this.opts.zoomMask = span;
-            
-        }
-
-        this.opts.zoomMask.classList.add('show');
-        
-        document.addEventListener('mousemove', this.moveHandler.bind(this))
+        this.opts.zoomMask = span;
     }
 
+    
+    getImgSrc () {
+        return this.img.dataset.src;
+    }
+
+    createZoomWindow () {
+        let div = document.createElement('div');
+        div.className = 'zoomWindow';
+
+        let { zoomW, zoomH } = this.opts;
+
+        div.style.width = zoomW + 'px';
+        div.style.height = zoomH + 'px';
+        div.style.top = this.offset.top + 'px';
+        div.style.left = this.offset.left + this.el.offsetWidth + 10 + 'px';
+
+
+        this.el.appendChild(div);
+
+        let img = new Image();
+        let imgSrc = this.img.dataset.src;
+        img.src = this.img.dataset.src;
+        div.appendChild(img);
+
+        this.opts.zoomWindow = div;
+        this.opts.zoomWindow.img = img;
+    }
 
 
     leaveHandler () {
         this.opts.zoomMask.classList.remove('show');
+        this.opts.zoomWindow.classList.remove('windowShow');
+        this.opts.mouseleaved = true;
     }
 
     moveHandler (e) {
@@ -136,10 +121,19 @@ class ImgZoom {
         if (parseInt(zoomMask.style.left) >= boundX) {
             zoomMask.style.left = boundX + 'px';
         }
+
+        let { img } = this.opts.zoomWindow;
+
+        let scale = img.offsetWidth / this.img.offsetWidth;
+      
+        let x = getElementLeft(this.opts.zoomMask) - this.offset.left - scale;
+        let y = getElementTop(this.opts.zoomMask) - this.offset.top - scale;
+
+        img.style.top = `-${y * scale}px`;
+        img.style.left = `-${x * scale}px`;
+
     }
     
 }
 
-new ImgZoom('.zoomWrapper');
-
-
+export default ImgZoom;
