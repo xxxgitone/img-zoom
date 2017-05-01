@@ -24,4 +24,4 @@ new ImgZoom('.zoomWrapper', {
 ![enter description here][1]
 
 
-  [1]: ./images/zoom.gif "zoom.gif"
+  [1]: ./img/zoom.gif "zoom.gif"
