@@ -21,7 +21,10 @@ new ImgZoom('.zoomWrapper', {
 
 ### 效果
 
+
+
+
 ![enter description here][1]
 
 
-  [1]: ./img/zoom.gif "zoom.gif"
+  [1]: ./img/zoom1.gif "zoom1.gif"
