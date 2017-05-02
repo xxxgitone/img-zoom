@@ -9,7 +9,7 @@
 2. 鼠标移入图片框，创建移动遮罩框，以及对应大图显示区。
 3. 根据移动遮罩框的移动位置，动态改变大图片的绝对定位位置。
 
-### 引入
+### 引入 [详细引入代码][1]
 
 ``` javascript
 new ImgZoom('.zoomWrapper', {
@@ -24,7 +24,8 @@ new ImgZoom('.zoomWrapper', {
 
 
 
-![enter description here][1]
+![enter description here][2]
 
 
-  [1]: ./img/zoom1.gif "zoom1.gif"
+  [1]: https://github.com/xxxgitone/img-zoom/blob/master/example/main.js
+  [2]: ./img/zoom1.gif "zoom1.gif"
